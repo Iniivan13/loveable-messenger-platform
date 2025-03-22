@@ -17,6 +17,13 @@ const nextConfig = {
       },
     ];
   },
+  // Ensure API routes work correctly
+  api: {
+    bodyParser: {
+      sizeLimit: '1mb',
+    },
+    externalResolver: true,
+  },
 };
 
 module.exports = nextConfig;

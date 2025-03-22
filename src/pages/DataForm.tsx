@@ -57,6 +57,7 @@ const DataForm = () => {
 
   async function onSubmit(data: FormValues) {
     setIsSubmitting(true);
+    setSubmissionStatus('idle');
     
     try {
       // Submit form data to our API endpoint
@@ -75,12 +76,19 @@ const DataForm = () => {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to submit form');
+        const errorData = await response.json();
+        console.error('Submission error:', errorData);
+        throw new Error(errorData.message || 'Failed to submit form');
       }
       
       setSubmissionStatus('success');
       toast.success("Your data has been submitted successfully!");
       form.reset();
+      
+      // Reload the page after 2 seconds to show updated data
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmissionStatus('error');

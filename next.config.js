@@ -17,13 +17,8 @@ const nextConfig = {
       },
     ];
   },
-  // Ensure API routes work correctly
-  api: {
-    bodyParser: {
-      sizeLimit: '1mb',
-    },
-    externalResolver: true,
-  },
+  // Disable the bodyParser size limit and enable external resolver
+  api: false, // Remove the incorrect api configuration
 };
 
 module.exports = nextConfig;

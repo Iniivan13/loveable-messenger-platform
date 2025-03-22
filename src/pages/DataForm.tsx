@@ -41,6 +41,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const DataForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'success' | 'error'>('idle');
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -58,16 +59,31 @@ const DataForm = () => {
     setIsSubmitting(true);
     
     try {
-      // In a real implementation, this would send data to Supabase
-      console.log("Form data to be sent to Supabase:", data);
+      // Submit form data to our API endpoint
+      const response = await fetch('/api/submitForm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: data.fullName,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          notes: data.notes || '',
+        }),
+      });
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        throw new Error('Failed to submit form');
+      }
       
+      setSubmissionStatus('success');
       toast.success("Your data has been submitted successfully!");
       form.reset();
     } catch (error) {
       console.error("Error submitting form:", error);
+      setSubmissionStatus('error');
       toast.error("Failed to submit data. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -219,8 +235,30 @@ const DataForm = () => {
                   "Submit Information"
                 )}
               </Button>
+              
+              {submissionStatus === 'success' && (
+                <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-md text-sm">
+                  Your information has been saved successfully. Thank you!
+                </div>
+              )}
+              
+              {submissionStatus === 'error' && (
+                <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
+                  There was an error saving your information. Please try again.
+                </div>
+              )}
             </form>
           </Form>
+        </div>
+        
+        <div className="mt-6 text-center">
+          <a 
+            href="/data/datadiri.json" 
+            target="_blank" 
+            className="text-blue-500 hover:underline"
+          >
+            View all submitted data
+          </a>
         </div>
       </div>
     </SimpleLayout>
